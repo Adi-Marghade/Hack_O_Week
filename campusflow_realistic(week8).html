@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusFlow - React Shreyash Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.development.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f5f6f8;color:#202938}
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:flex}
+.dark{background:#0f172a;color:#fff}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:#172033;color:#fff;padding:24px 14px}
+.logo{font-size:20px;font-weight:600;margin-bottom:34px;padding-left:10px;letter-spacing:.1px}
+.logo span{color:#3b82f6}
+.menu-title{font-size:11px;color:#9ca3af;margin:25px 10px 8px}
+.menu{padding:11px 12px;margin:4px 0;border-radius:6px;color:#cbd5e1;font-size:14px}
+.menu.active{background:#26364f;color:#fff;border-left:3px solid #4f8cff}.menu:hover{background:#202e44;color:#fff}.menu{cursor:pointer}
+.main{margin-left:230px;width:calc(100% - 230px)}
+.topbar{height:68px;background:#fff;border-bottom:1px solid #e2e6ec;display:flex;justify-content:space-between;align-items:center;padding:0 30px}
+.dark .topbar,.dark .card,.dark .stat{background:#1e293b;border-color:#334155}
+.search{width:300px}.search input{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:7px;outline:none}
+.dark .search input{background:#0f172a;color:#fff;border-color:#475569}
+.right{display:flex;align-items:center;gap:15px}.theme{border:0;background:#f1f5f9;border-radius:50%;width:40px;height:40px;font-size:18px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.content{padding:28px 32px;max-width:1450px}.welcome h1{margin-bottom:5px}.welcome p,.stat p{color:#64748b}.dark .welcome p,.dark .stat p{color:#94a3b8}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0}
+.stat{background:#fff;border:1px solid #e1e5ea;border-radius:7px;padding:18px 20px}.stat h2{font-size:28px;margin:15px 0 5px}
+.grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:18px}.card{background:#fff;border:1px solid #e1e5ea;border-radius:7px;padding:20px;margin-bottom:18px}
+.card-header{display:flex;justify-content:space-between;align-items:center}.card-header h2{margin:0}
+.add-btn{background:#2563eb;color:#fff;border:0;padding:9px 14px;border-radius:5px;font-size:13px}
+.task{display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid #e8ebef;margin-top:0}.task:last-child{border-bottom:0}
+.dark .task{border-color:#475569}.task-left{display:flex;align-items:center;gap:12px}.task-name{font-weight:bold;margin-bottom:7px}
+.completed{text-decoration:line-through;color:#94a3b8}.tag{display:inline-block;padding:3px 7px;border-radius:4px;background:#eef2f7;color:#526173;font-size:11px;margin-right:5px}
+.high{background:#fce8e8;color:#b42318}.medium{background:#fff4d6;color:#9a6700}.low{background:#e7f5eb;color:#217a3b}
+.delete{border:0;background:transparent;font-size:18px;color:#ef4444}
+.progress{height:9px;background:#e5e7eb;border-radius:10px;overflow:hidden}.progress-bar{height:100%;background:#2563eb}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:10}
+.modal{background:#fff;width:450px;max-width:90%;padding:25px;border-radius:10px;color:#172033}
+.form-group{margin-bottom:15px}.form-group label{display:block;font-weight:bold;font-size:13px;margin-bottom:6px}
+.form-group input,.form-group select{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:6px}
+.form-buttons{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.cancel{border:0;padding:10px 15px;border-radius:6px;background:#e5e7eb}
+.status{padding:12px;background:#ecfdf5;color:#166534;border-radius:8px;margin-bottom:20px}.section-title{font-size:26px;margin:10px 0 6px}
+.section-subtitle{color:#64748b;margin-top:0;margin-bottom:22px}
+.dark .section-subtitle{color:#94a3b8}
+.course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.course-card{border:1px solid #e5e7eb;border-radius:9px;padding:18px}
+.dark .course-card{border-color:#475569}
+.course-card h3{margin-top:0}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{border:1px solid #e5e7eb;border-radius:8px;padding:10px;min-height:90px}
+.dark .day{border-color:#475569}
+.day-name{font-weight:bold;font-size:12px;color:#64748b}
+.event{margin-top:8px;background:#dbeafe;color:#1d4ed8;padding:5px;border-radius:5px;font-size:11px}
+.dark .event{background:#1e3a8a;color:#dbeafe}
+.profile-grid{display:grid;grid-template-columns:1fr 2fr;gap:20px}
+.profile-box{border:1px solid #e5e7eb;border-radius:10px;padding:20px}
+.dark .profile-box{border-color:#475569}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #e5e7eb}
+.dark .settings-row{border-color:#475569}
+.toggle{padding:8px 14px;border:0;border-radius:20px;background:#2563eb;color:#fff}
+@media(max-width:900px){.course-grid{grid-template-columns:1fr}.calendar-grid{grid-template-columns:repeat(2,1fr)}.profile-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;width:100%}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+@media(max-width:600px){.stats{grid-template-columns:1fr}.search{width:180px}.content{padding:15px}}
+</style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script>
+(function(){
+  if(!window.React || !window.ReactDOM){
+    document.getElementById("root").innerHTML =
+      '<div style="padding:40px;font-family:Arial"><h2>React could not load.</h2><p>Please make sure your computer is connected to the internet, then refresh this page.</p><p>If internet is available and this message remains, the CDN may be blocked.</p></div>';
+    return;
+  }
+
+  const {useState,useEffect,useRef,useMemo,useCallback,useContext,createContext} = React;
+  const e = React.createElement;
+
+  /* CUSTOM HOOK */
+  function useLocalStorage(key, initialValue){
+    const [value,setValue] = useState(function(){
+      try{
+        const saved=localStorage.getItem(key);
+        return saved ? JSON.parse(saved) : initialValue;
+      }catch(err){ return initialValue; }
+    });
+    useEffect(function(){
+      localStorage.setItem(key,JSON.stringify(value));
+    },[key,value]);
+    return [value,setValue];
+  }
+
+  /* CONTEXT */
+  const ThemeContext=createContext();
+
+  function ThemeProvider(props){
+    const [dark,setDark]=useState(false);
+    const toggleTheme=useCallback(function(){setDark(function(v){return !v})},[]);
+    return e(ThemeContext.Provider,{value:{dark,toggleTheme}},props.children);
+  }
+
+  function Sidebar(){
+    return e("aside",{className:"sidebar"},
+      e("div",{className:"logo"},"Campus",e("span",null,"Flow")),
+      e("div",{className:"menu-title"},"MAIN"),
+      e("div",{className:"menu active",onClick:function(){window.scrollTo({top:0,behavior:"smooth"})}},"Dashboard"),
+      e("div",{className:"menu",onClick:function(){var el=document.getElementById("assignments");if(el){el.scrollIntoView({behavior:"smooth",block:"start"})}}},"Assignments"),
+      e("div",{className:"menu",onClick:function(){var el=document.getElementById("courses");if(el){el.scrollIntoView({behavior:"smooth",block:"start"})}}},"Courses"),
+      e("div",{className:"menu",onClick:function(){var el=document.getElementById("calendar");if(el){el.scrollIntoView({behavior:"smooth",block:"start"})}}},"Calendar"),
+      e("div",{className:"menu-title"},"ACCOUNT"),
+      e("div",{className:"menu",onClick:function(){var el=document.getElementById("profile");if(el){el.scrollIntoView({behavior:"smooth",block:"start"})}}},"Profile"),
+      e("div",{className:"menu",onClick:function(){var el=document.getElementById("settings");if(el){el.scrollIntoView({behavior:"smooth",block:"start"})}}},"Settings")
+    );
+  }
+
+  function Header(props){
+    const theme=useContext(ThemeContext);
+    return e("div",{className:"topbar"},
+      e("div",{className:"search"},
+        e("input",{
+          placeholder:"Search assignments",
+          value:props.search,
+          onChange:function(ev){props.setSearch(ev.target.value)}
+        })
+      ),
+      e("div",{className:"right"},
+        e("button",{className:"theme",onClick:theme.toggleTheme},theme.dark?"☀️":"🌙"),
+        e("div",{className:"avatar"},"SG"),
+        e("div",null,e("strong",null,"Shreyash"),e("br"),e("small",null,"B.Tech CSE"))
+      )
+    );
+  }
+
+  function StatCard(props){
+    return e("div",{className:"stat"},
+      e("div",null,props.icon+" "+props.title),
+      e("h2",null,props.value),
+      e("p",null,props.description)
+    );
+  }
+
+  function TaskItem(props){
+    return e("div",{className:"task"},
+      e("div",{className:"task-left"},
+        e("input",{type:"checkbox",checked:props.task.completed,onChange:function(){props.toggleTask(props.task.id)}}),
+        e("div",null,
+          e("div",{className:props.task.completed?"task-name completed":"task-name"},props.task.title),
+          e("span",{className:"tag"},props.task.subject),
+          e("span",{className:"tag "+props.task.priority.toLowerCase()},props.task.priority),
+          e("span",{className:"tag"},"📅 "+props.task.date)
+        )
+      ),
+      e("button",{className:"delete",onClick:function(){props.deleteTask(props.task.id)}},"🗑️")
+    );
+  }
+
+  function TaskList(props){
+    return e("div",{className:"card",id:"assignments"},
+      e("div",{className:"card-header"},e("h2",null,"Recent Assignments")),
+      props.tasks.length===0
+        ? e("p",null,"No assignments found.")
+        : props.tasks.map(function(task){
+            return e(TaskItem,{key:task.id,task:task,toggleTask:props.toggleTask,deleteTask:props.deleteTask});
+          })
+    );
+  }
+
+  function AddTask(props){
+    const inputRef=useRef(null);
+    const [title,setTitle]=useState("");
+    const [subject,setSubject]=useState("Web Development");
+    const [priority,setPriority]=useState("Medium");
+    const [date,setDate]=useState("");
+
+    useEffect(function(){inputRef.current.focus()},[]);
+
+    function submit(ev){
+      ev.preventDefault();
+      if(!title.trim()){alert("Please enter assignment name.");inputRef.current.focus();return;}
+      props.addTask({
+        id:Date.now(),title:title,subject:subject,priority:priority,
+        date:date||"No date",completed:false
+      });
+      props.close();
+    }
+
+    return e("div",{className:"overlay"},
+      e("div",{className:"modal"},
+        e("h2",null,"New Assignment"),
+        e("form",{onSubmit:submit},
+          e("div",{className:"form-group"},
+            e("label",null,"Assignment Name"),
+            e("input",{ref:inputRef,placeholder:"Example: React Practical",value:title,onChange:function(ev){setTitle(ev.target.value)}})
+          ),
+          e("div",{className:"form-group"},
+            e("label",null,"Subject"),
+            e("select",{value:subject,onChange:function(ev){setSubject(ev.target.value)}},
+              e("option",null,"Web Development"),
+              e("option",null,"Data Structures"),
+              e("option",null,"JavaScript"),
+              e("option",null,"React"),
+              e("option",null,"Computer Networks")
+            )
+          ),
+          e("div",{className:"form-group"},
+            e("label",null,"Priority"),
+            e("select",{value:priority,onChange:function(ev){setPriority(ev.target.value)}},
+              e("option",null,"High"),e("option",null,"Medium"),e("option",null,"Low")
+            )
+          ),
+          e("div",{className:"form-group"},
+            e("label",null,"Due Date"),
+            e("input",{type:"date",value:date,onChange:function(ev){setDate(ev.target.value)}})
+          ),
+          e("div",{className:"form-buttons"},
+            e("button",{type:"button",className:"cancel",onClick:props.close},"Cancel"),
+            e("button",{type:"submit",className:"add-btn"},"Save assignment")
+          )
+        )
+      )
+    );
+  }
+
+  function App(){
+    const [tasks,setTasks]=useLocalStorage("campusflow_tasks",[
+      {id:1,title:"Complete React Practical",subject:"Web Development",priority:"High",date:"25 Sep 2026",completed:false},
+      {id:2,title:"Study Graph Algorithms",subject:"Data Structures",priority:"Medium",date:"27 Sep 2026",completed:false},
+      {id:3,title:"JavaScript Array Methods",subject:"JavaScript",priority:"Low",date:"29 Sep 2026",completed:true}
+    ]);
+    const [search,setSearch]=useState("");
+    const [showAdd,setShowAdd]=useState(false);
+    const theme=useContext(ThemeContext);
+
+    const addTask=useCallback(function(task){setTasks(function(old){return old.concat([task])})},[]);
+    const deleteTask=useCallback(function(id){setTasks(function(old){return old.filter(function(t){return t.id!==id})})},[]);
+    const toggleTask=useCallback(function(id){setTasks(function(old){return old.map(function(t){return t.id===id?Object.assign({},t,{completed:!t.completed}):t})})},[]);
+
+    const filtered=useMemo(function(){
+      const q=search.toLowerCase();
+      return tasks.filter(function(t){return t.title.toLowerCase().includes(q)||t.subject.toLowerCase().includes(q)});
+    },[tasks,search]);
+
+    const total=useMemo(function(){return tasks.length},[tasks]);
+    const completed=useMemo(function(){return tasks.filter(function(t){return t.completed}).length},[tasks]);
+    const pending=total-completed;
+    const progress=total?Math.round(completed/total*100):0;
+
+    return e("div",{className:theme.dark?"app dark":"app"},
+      e(Sidebar),
+      e("main",{className:"main"},
+        e(Header,{search:search,setSearch:setSearch}),
+        e("section",{className:"content"},
+          e("div",{className:"welcome"},
+            e("div",{style:{fontSize:"12px",color:"#64748b",marginBottom:"6px"}},"STUDENT DASHBOARD"),
+            e("h1",null,"Good morning"),
+            e("p",null,"Here is your academic overview for this week.")
+          ),
+          e("div",{className:"stats"},
+            e(StatCard,{icon:"",title:"Assignments",value:total,description:"This semester"}),
+            e(StatCard,{icon:"",title:"Pending",value:pending,description:"Due soon"}),
+            e(StatCard,{icon:"",title:"Completed",value:completed,description:"Completed"}),
+            e(StatCard,{icon:"",title:"Progress",value:progress+"%",description:"Completion"})
+          ),
+          e("div",{className:"grid"},
+            e("div",null,
+              e("div",{className:"card"},
+                e("div",{className:"card-header"},
+                  e("h2",null,"Assignment Summary"),
+                  e("button",{className:"add-btn",onClick:function(){setShowAdd(true)}},"Add assignment")
+                ),
+                e("p",null,"Completion: "+progress+"%"),
+                e("div",{className:"progress"},e("div",{className:"progress-bar",style:{width:progress+"%"}}))
+              ),
+              e(TaskList,{tasks:filtered,toggleTask:toggleTask,deleteTask:deleteTask})
+            ),
+            e("div",null,
+              e("div",{className:"card"},
+                e("h2",null,"Course Progress"),
+                e("p",null,"Web Development — 75%"),e("div",{className:"progress"},e("div",{className:"progress-bar",style:{width:"75%"}})),
+                e("p",null,"Data Structures — 60%"),e("div",{className:"progress"},e("div",{className:"progress-bar",style:{width:"60%"}})),
+                e("p",null,"JavaScript — 85%"),e("div",{className:"progress"},e("div",{className:"progress-bar",style:{width:"85%"}})),
+                e("p",null,"React — 45%"),e("div",{className:"progress"},e("div",{className:"progress-bar",style:{width:"45%"}}))
+              ),
+              e("div",{className:"card"},
+                e("h2",null,"Shreyash Profile"),
+                e("p",null,e("b",null,"Program:")," B.Tech Computer Science"),
+                e("p",null,e("b",null,"Goal:")," Software Development"),
+                e("p",null,e("b",null,"Current focus:")," React, JavaScript and DSA")
+              )
+            )
+          ),
+
+          e("div",{id:"courses",className:"card"},
+            e("h2",{className:"section-title"},"My Courses"),
+            e("p",{className:"section-subtitle"},"Track your subjects and learning progress."),
+            e("div",{className:"course-grid"},
+              e("div",{className:"course-card"},
+                e("h3",null,"Web Development"),
+                e("p",null,"HTML, CSS, JavaScript & React"),
+                e("p",null,"Progress: 75%"),
+                e("div",{className:"progress"},e("div",{className:"progress-bar",style:{width:"75%"}}))
+              ),
+              e("div",{className:"course-card"},
+                e("h3",null,"Data Structures"),
+                e("p",null,"Graphs, Trees, Sorting & Algorithms"),
+                e("p",null,"Progress: 60%"),
+                e("div",{className:"progress"},e("div",{className:"progress-bar",style:{width:"60%"}}))
+              ),
+              e("div",{className:"course-card"},
+                e("h3",null,"JavaScript & React"),
+                e("p",null,"ES6, Hooks, Components & State"),
+                e("p",null,"Progress: 85%"),
+                e("div",{className:"progress"},e("div",{className:"progress-bar",style:{width:"85%"}}))
+              )
+            )
+          ),
+
+          e("div",{id:"calendar",className:"card"},
+            e("h2",{className:"section-title"},"Academic Calendar"),
+            e("p",{className:"section-subtitle"},"Week of 21–27 September 2026"),
+            e("div",{className:"calendar-grid"},
+              e("div",{className:"day"},e("div",{className:"day-name"},"MON"),e("div",{className:"event"},"10:00 React Lab")),
+              e("div",{className:"day"},e("div",{className:"day-name"},"TUE"),e("div",{className:"event"},"11:00 DSA Lecture")),
+              e("div",{className:"day"},e("div",{className:"day-name"},"WED"),e("div",{className:"event"},"2:00 Web Dev")),
+              e("div",{className:"day"},e("div",{className:"day-name"},"THU"),e("div",{className:"event"},"10:00 JavaScript")),
+              e("div",{className:"day"},e("div",{className:"day-name"},"FRI"),e("div",{className:"event"},"12:00 DSA Lab")),
+              e("div",{className:"day"},e("div",{className:"day-name"},"SAT"),e("div",{className:"event"},"Project Work")),
+              e("div",{className:"day"},e("div",{className:"day-name"},"SUN"),e("div",{className:"event"},"No Classes"))
+            )
+          ),
+
+          e("div",{id:"profile",className:"card"},
+            e("h2",{className:"section-title"},"Shreyash Profile"),
+            e("p",{className:"section-subtitle"},"Your academic information."),
+            e("div",{className:"profile-grid"},
+              e("div",{className:"profile-box"},
+                e("div",{className:"avatar",style:{width:"70px",height:"70px",fontSize:"22px",marginBottom:"15px"}},"SG"),
+                e("h3",null,"Shreyash Girade"),
+                e("p",null,"B.Tech — Computer Science & Engineering")
+              ),
+              e("div",{className:"profile-box"},
+                e("p",null,e("b",null,"Program: "),"B.Tech CSE"),
+                e("p",null,e("b",null,"Semester: "),"Current Semester"),
+                e("p",null,e("b",null,"Goal: "),"Software Development"),
+                e("p",null,e("b",null,"Learning: "),"React, JavaScript, DSA")
+              )
+            )
+          ),
+
+          e("div",{id:"settings",className:"card"},
+            e("h2",{className:"section-title"},"Settings"),
+            e("p",{className:"section-subtitle"},"Application preferences."),
+            e("div",{className:"settings-row"},
+              e("div",null,e("b",null,"Dark Mode"),e("div",null,"Use the moon button in the top bar.")),
+              e("button",{className:"toggle",onClick:theme.toggleTheme},theme.dark?"Turn Light":"Turn Dark")
+            ),
+            e("div",{className:"settings-row"},
+              e("div",null,e("b",null,"Saved Data"),e("div",null,"Assignments are saved in your browser.")),
+              e("button",{className:"toggle",onClick:function(){alert("Your assignments are saved automatically in Local Storage.")}},"Check")
+            ),
+            e("div",{className:"settings-row"},
+              e("div",null,e("b",null,"Reset Assignments"),e("div",null,"Remove all saved assignments.")),
+              e("button",{className:"toggle",onClick:function(){if(confirm("Delete all assignments?")){setTasks([])}}},"Reset")
+            )
+          )
+        )
+      ),
+      showAdd && e(AddTask,{close:function(){setShowAdd(false)},addTask:addTask})
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    e(ThemeProvider,null,e(App))
+  );
+})();
+</script>
+</body>
+</html>
